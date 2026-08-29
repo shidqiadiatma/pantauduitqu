@@ -1,0 +1,28 @@
+<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="22" y1="18" x2="138" y2="142" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B1725"/>
+      <stop offset="0.5" stop-color="#101F32"/>
+      <stop offset="1" stop-color="#081521"/>
+    </linearGradient>
+    <linearGradient id="pGradient" x1="48" y1="30" x2="120" y2="122" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7DD3FC"/>
+      <stop offset="0.5" stop-color="#5EEAD4"/>
+      <stop offset="1" stop-color="#60A5FA"/>
+    </linearGradient>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#67E8F9" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <rect x="10" y="10" width="140" height="140" rx="34" fill="url(#bg)"/>
+  <rect x="10" y="10" width="140" height="140" rx="34" stroke="rgba(148,163,184,0.24)" stroke-width="1.2"/>
+
+  <g filter="url(#softShadow)">
+    <path d="M62 36V124H88C104 124 116 112 116 97.5C116 83.2 104 71 88 71H76V36H62ZM76 56H86C95 56 101 61.5 101 72.2C101 82.8 95 88.3 86 88.3H76V56Z" fill="url(#pGradient)"/>
+    <path d="M100 46L120 46V67L100 67" stroke="#A7F3D0" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <path d="M70 41V119" stroke="#DCFCE7" stroke-opacity="0.24" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="116" cy="46" r="8" fill="#A7F3D0" opacity="0.9"/>
+</svg>
