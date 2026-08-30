@@ -6,7 +6,7 @@ import mysql from 'mysql2/promise'
 import nodemailer from 'nodemailer'
 
 const app = express()
-const PORT = 3001
+const PORT = Number(process.env.PORT || 3001)
 const pendingOtps = new Map()
 const OTP_REQUIRED = String(process.env.OTP_REQUIRED || 'false').toLowerCase() === 'true'
 

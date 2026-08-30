@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 
-const API_BASE = 'http://localhost:3001/api'
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
 
 const defaultInvestmentData = []
 const defaultSavingData = []
@@ -405,6 +405,27 @@ const totalPortfolioProfitLoss = computed(() => {
   }
 })
 
+const riskProfileLevels = [
+  {
+    label: 'Conservative',
+    level: 'Low',
+    className: 'conservative',
+    description: 'Disarankan 70-80% aset aman seperti tabungan, reksadana pendapatan tetap, dan emas. Sisanya 20-30% untuk aset tumbuh agar tetap memberi potensi kenaikan.',
+  },
+  {
+    label: 'Moderate',
+    level: 'Medium',
+    className: 'moderate',
+    description: 'Disarankan 50-60% aset aman dan 40-50% aset tumbuh seperti saham, reksadana campuran, atau crypto dengan porsi terukur.',
+  },
+  {
+    label: 'Agresif',
+    level: 'High',
+    className: 'aggressive',
+    description: 'Disarankan 20-30% aset aman dan 70-80% aset berisiko tinggi seperti saham, crypto, dan reksadana saham untuk pertumbuhan maksimal.',
+  },
+]
+
 const portfolioRiskProfile = computed(() => {
   const total = totalPortfolio.value || 1
   const investmentShare = totalInvestasiNilaiSaatIni.value / total
@@ -421,29 +442,14 @@ const portfolioRiskProfile = computed(() => {
   const riskIndex = Math.min(1, (investmentShare * 0.7) + (riskAssetScore / Math.max(investmentData.value.length || 1, 1)) * 0.3)
 
   if (riskIndex >= 0.7) {
-    return {
-      label: 'Agresif',
-      level: 'High',
-      description: 'Portofolio Anda cenderung mengutamakan aset berisiko tinggi.',
-      className: 'aggressive',
-    }
+    return riskProfileLevels[2]
   }
 
   if (riskIndex >= 0.35) {
-    return {
-      label: 'Moderate',
-      level: 'Medium',
-      description: 'Portofolio Anda seimbang antara pertumbuhan dan kestabilan.',
-      className: 'moderate',
-    }
+    return riskProfileLevels[1]
   }
 
-  return {
-    label: 'Conservative',
-    level: 'Low',
-    description: 'Portofolio Anda lebih fokus pada keamanan dan kestabilan modal.',
-    className: 'conservative',
-  }
+  return riskProfileLevels[0]
 })
 
 const chartGradient = computed(() => {
@@ -1118,11 +1124,17 @@ const closeUserDetail = () => {
               i
             </button>
           </div>
-          <strong>{{ portfolioRiskProfile.label }} - {{ portfolioRiskProfile.level }}</strong>
-          <small>{{ portfolioRiskProfile.description }}</small>
+
+          <div class="risk-summary">
+            <strong>{{ portfolioRiskProfile.label }}</strong>
+            <span class="risk-level-badge">{{ portfolioRiskProfile.level }}</span>
+          </div>
+
           <div v-if="riskInfoVisible" class="risk-info-tooltip">
-            <strong>{{ portfolioRiskProfile.label }} - {{ portfolioRiskProfile.level }}</strong>
-            <span>{{ portfolioRiskProfile.description }}</span>
+            <div v-for="risk in riskProfileLevels" :key="`${risk.label}-${risk.level}`" class="risk-level-item">
+              <strong>{{ risk.label }} - {{ risk.level }}</strong>
+              <span>{{ risk.description }}</span>
+            </div>
           </div>
         </article>
       </section>
