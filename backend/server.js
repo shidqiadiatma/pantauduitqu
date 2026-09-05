@@ -58,8 +58,7 @@ const sendOtpEmail = async (email, otp) => {
   const transporter = createSmtpTransporter()
 
   if (!transporter) {
-    console.log(`OTP untuk ${email}: ${otp}`)
-    return { fallback: true }
+    throw new Error('SMTP belum dikonfigurasi. Isi SMTP_HOST, SMTP_USER, dan SMTP_PASS.')
   }
 
   const info = await transporter.sendMail({
@@ -241,18 +240,16 @@ app.post('/api/request-otp', async (req, res) => {
   }
 
   const otp = createOtp()
-  pendingOtps.set(normalizedEmail, {
-    otp,
-    expiresAt: Date.now() + 5 * 60 * 1000,
-  })
 
   try {
-    const sendResult = await sendOtpEmail(normalizedEmail, otp)
-    if (sendResult.fallback) {
-      console.log(`OTP untuk ${normalizedEmail}: ${otp} (fallback via console)`)
-    }
+    await sendOtpEmail(normalizedEmail, otp)
+    pendingOtps.set(normalizedEmail, {
+      otp,
+      expiresAt: Date.now() + 5 * 60 * 1000,
+    })
   } catch (error) {
     console.error('Failed to send OTP email:', error)
+    return res.status(503).json({ message: 'OTP gagal dikirim. Periksa konfigurasi SMTP dan coba lagi.' })
   }
 
   res.json({
