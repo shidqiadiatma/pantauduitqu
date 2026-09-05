@@ -127,6 +127,15 @@ const requestOtp = async () => {
   }
 }
 
+const switchAuthMode = () => {
+  authMode.value = authMode.value === 'login' ? 'register' : 'login'
+  authForm.value = { name: '', email: '', password: '' }
+  otpCode.value = ''
+  otpState.value = 'idle'
+  otpMessage.value = ''
+  authError.value = ''
+}
+
 const handleAuthSubmit = async () => {
   authError.value = ''
 
@@ -869,7 +878,7 @@ const closeUserDetail = () => {
 
       <div class="auth-switch">
         <span>{{ authMode === 'login' ? 'Belum punya akun?' : 'Sudah punya akun?' }}</span>
-        <button type="button" class="switch-button" @click="authMode = authMode === 'login' ? 'register' : 'login'">
+        <button type="button" class="switch-button" @click="switchAuthMode">
           {{ authMode === 'login' ? 'Daftar sekarang' : 'Masuk di sini' }}
         </button>
       </div>
