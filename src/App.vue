@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://pantauduitqu-finance-portfolio-racker.onrender.com/api'
 
 const defaultInvestmentData = []
 const defaultSavingData = []
