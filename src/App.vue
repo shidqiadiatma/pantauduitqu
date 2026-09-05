@@ -12,6 +12,7 @@ const otpCode = ref('')
 const otpState = ref('idle')
 const otpMessage = ref('')
 const authError = ref('')
+const authSuccess = ref('')
 const currentUser = ref(null)
 const adminUsers = ref([])
 const selectedUserDetail = ref(null)
@@ -134,6 +135,7 @@ const switchAuthMode = () => {
   otpState.value = 'idle'
   otpMessage.value = ''
   authError.value = ''
+  authSuccess.value = ''
 }
 
 const handleAuthSubmit = async () => {
@@ -175,9 +177,11 @@ const handleAuthSubmit = async () => {
       otpCode.value = ''
       otpState.value = 'idle'
       otpMessage.value = ''
-      authError.value = 'Registrasi berhasil. Silakan login.'
+      authError.value = ''
+      authSuccess.value = 'Registrasi berhasil. Silakan login.'
       return
     } catch (error) {
+      authSuccess.value = ''
       authError.value = error.message || 'Registrasi gagal.'
       return
     }
@@ -870,6 +874,7 @@ const closeUserDetail = () => {
         </label>
 
         <p v-if="authError" class="auth-error">{{ authError }}</p>
+        <p v-if="authSuccess" class="auth-success">{{ authSuccess }}</p>
 
         <button type="submit" class="primary-btn auth-submit">
           {{ authMode === 'login' ? 'Login' : 'Verifikasi & Daftar' }}
