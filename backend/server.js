@@ -522,11 +522,17 @@ app.delete('/api/portfolio/:userId/saving/:id', async (req, res) => {
   res.status(204).send()
 })
 
-initializeDatabase().catch((error) => {
-  console.error('MySQL initialization failed:', error)
-})
+const startServer = async () => {
+  try {
+    await initializeDatabase()
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Backend running on http://0.0.0.0:${PORT}`)
+      console.log(`Using MySQL database: ${DB_CONFIG.database} at ${DB_CONFIG.host}:${DB_CONFIG.port}`)
+    })
+  } catch (error) {
+    console.error('MySQL initialization failed. Check MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASSWORD, and MYSQL_DATABASE:', error)
+    process.exit(1)
+  }
+}
 
-app.listen(PORT, () => {
-  console.log(`Backend running on http://localhost:${PORT}`)
-  console.log(`Using MySQL database: ${DB_CONFIG.database} at ${DB_CONFIG.host}:${DB_CONFIG.port}`)
-})
+startServer()
