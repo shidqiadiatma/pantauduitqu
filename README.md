@@ -6,7 +6,7 @@ PantauDuitQu adalah aplikasi dashboard personal finance untuk memantau investasi
 - Dashboard portofolio investasi dan tabungan
 - CRUD aset investasi dan tabungan
 - Login dan registrasi user
-- Validasi OTP email saat registrasi
+- Validasi OTP saat registrasi dengan dukungan SMTP real atau mode testing
 - Role superadmin untuk monitoring pengguna
 - Analisis risiko dan profit/loss
 - Pagination untuk tabel data
@@ -54,7 +54,9 @@ Sebelum menjalankan project, pastikan perangkat sudah memiliki:
    MYSQL_PASSWORD=your_mysql_password
    MYSQL_DATABASE=pantauduitqu
    PORT=3001
-   OTP_REQUIRED=false
+   OTP_REQUIRED=true
+   OTP_TEST_CODE=
+   VITE_API_BASE_URL=http://localhost:3001/api
 
    SMTP_HOST=smtp.gmail.com
    SMTP_PORT=465
@@ -65,8 +67,31 @@ Sebelum menjalankan project, pastikan perangkat sudah memiliki:
    ```
 
    Catatan:
-   - `OTP_REQUIRED=false` untuk mode testing lokal
-   - `OTP_REQUIRED=true` untuk mode produksi dengan SMTP yang valid
+   - `OTP_REQUIRED=true` mewajibkan OTP saat registrasi.
+   - Kosongkan `OTP_TEST_CODE` untuk menggunakan OTP real melalui SMTP.
+   - Isi `OTP_TEST_CODE=123456` hanya untuk mode testing tanpa SMTP.
+   - Jangan commit `.env` atau membagikan `SMTP_PASS`.
+
+### Konfigurasi Gmail SMTP
+Untuk mengirim OTP real, aktifkan 2-Step Verification pada akun Gmail lalu buat Gmail App Password. Gunakan App Password, bukan password Gmail biasa.
+
+```env
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-16-digit-app-password
+SMTP_FROM="PantauDuitQu <your-email@gmail.com>"
+OTP_REQUIRED=true
+OTP_TEST_CODE=
+```
+
+Jika koneksi port 465 bermasalah, gunakan:
+
+```env
+SMTP_PORT=587
+SMTP_SECURE=false
+```
 
 ## Menyiapkan database MySQL
 1. Pastikan MySQL Server sudah berjalan.
@@ -100,6 +125,50 @@ Aplikasi dapat dibuka di:
 ```bash
 npm run build
 ```
+
+## Deploy ke Render dan Vercel
+### Backend di Render
+Gunakan konfigurasi berikut:
+
+```text
+Build Command: npm install
+Start Command: node backend/server.js
+Root Directory: kosong
+```
+
+Environment variable database Render harus menggunakan host MySQL cloud, bukan `localhost`:
+
+```env
+PORT=10000
+MYSQL_HOST=host-mysql-cloud
+MYSQL_PORT=3306
+MYSQL_USER=root
+MYSQL_PASSWORD=password-mysql
+MYSQL_DATABASE=railway
+OTP_REQUIRED=true
+OTP_TEST_CODE=123456
+```
+
+Gunakan `OTP_TEST_CODE=123456` hanya untuk testing. Untuk OTP real, hapus nilainya dan isi konfigurasi SMTP.
+
+### Frontend di Vercel
+Gunakan pengaturan:
+
+```text
+Framework Preset: Vite atau Other
+Root Directory: kosong
+Build Command: npm run build
+Output Directory: dist
+Install Command: npm install
+```
+
+Tambahkan environment variable Vercel:
+
+```env
+VITE_API_BASE_URL=https://pantauduitqu-finance-portfolio-racker.onrender.com/api
+```
+
+Vercel akan menyediakan domain gratis dengan format `*.vercel.app`.
 
 ## Default akun
 Saat database pertama kali dibuat, aplikasi akan otomatis membuat akun berikut:
