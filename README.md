@@ -201,12 +201,42 @@ portfolio-saving-tracker/
 - Jika port 4173 atau 3001 sudah dipakai, ubah port sesuai kebutuhan.
 
 ## Git workflow
+Gunakan branch berikut:
+
+- `development`: branch aktif untuk pengembangan dan testing.
+- `master`: branch production yang digunakan oleh deployment production.
+
+Alur perubahan yang disarankan:
+
+```bash
+# Mulai atau lanjutkan development
+git switch development
+git pull origin development
+
+# Simpan perubahan ke branch development
+git add .
+git commit -m "Describe your change"
+git push origin development
+```
+
+Setelah fitur selesai dan sudah diuji, buat Pull Request dari `development` ke `master`. Deploy production hanya boleh mengambil source dari `master`.
+
+Untuk update production secara manual:
+
+```bash
+git switch master
+git pull origin master
+git merge development
+git push origin master
+```
+
+Repository production sebaiknya dikonfigurasi untuk deploy dari branch `master`, sedangkan preview/testing dapat memakai branch `development`.
+
+Perintah inisialisasi repository:
+
 ```bash
 git init
 git add .
 git commit -m "Initial commit"
-git branch -M main
-git remote add origin <repo-url>
-git push -u origin main
 ```
 
