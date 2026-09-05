@@ -9,6 +9,7 @@ const app = express()
 const PORT = Number(process.env.PORT || 3001)
 const pendingOtps = new Map()
 const OTP_REQUIRED = String(process.env.OTP_REQUIRED || 'false').toLowerCase() === 'true'
+const OTP_TEST_CODE = String(process.env.OTP_TEST_CODE || '123456')
 
 const DB_CONFIG = {
   host: process.env.MYSQL_HOST || '127.0.0.1',
@@ -243,6 +244,18 @@ app.post('/api/request-otp', async (req, res) => {
   }
 
   const otp = createOtp()
+
+  if (OTP_TEST_CODE) {
+    pendingOtps.set(normalizedEmail, {
+      otp: OTP_TEST_CODE,
+      expiresAt: Date.now() + 5 * 60 * 1000,
+    })
+
+    return res.json({
+      message: `Mode testing aktif. Gunakan OTP ${OTP_TEST_CODE}.`,
+      email: normalizedEmail,
+    })
+  }
 
   try {
     await sendOtpEmail(normalizedEmail, otp)
