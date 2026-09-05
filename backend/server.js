@@ -90,6 +90,10 @@ const sanitizeUser = (user) => ({
 
 const escapeIdentifier = (value) => `\`${String(value).replace(/`/g, '``')}\``
 
+app.get('/', (req, res) => {
+  res.json({ service: 'PantauDuitQu API', status: 'ok' })
+})
+
 const initializeDatabase = async () => {
   const adminConnection = await mysql.createConnection({
     host: DB_CONFIG.host,
