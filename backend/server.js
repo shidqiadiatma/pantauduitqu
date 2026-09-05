@@ -47,6 +47,9 @@ const createSmtpTransporter = () => {
     host: smtpConfig.host,
     port: smtpConfig.port,
     secure: smtpConfig.secure,
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
     auth: {
       user: smtpConfig.user,
       pass: smtpConfig.pass,
@@ -249,7 +252,7 @@ app.post('/api/request-otp', async (req, res) => {
     })
   } catch (error) {
     console.error('Failed to send OTP email:', error)
-    return res.status(503).json({ message: 'OTP gagal dikirim. Periksa konfigurasi SMTP dan coba lagi.' })
+    return res.status(503).json({ message: 'OTP gagal dikirim dalam batas waktu. Periksa konfigurasi SMTP dan coba lagi.' })
   }
 
   res.json({
