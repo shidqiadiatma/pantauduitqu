@@ -700,7 +700,7 @@ const resetSavingForm = () => {
 }
 
 const updateAmountInput = (form, field, event) => {
-  form.value[field] = formatAmountInput(event.target.value)
+  form[field] = formatAmountInput(event.target.value)
 }
 
 const addOrUpdateInvestment = async () => {
@@ -1232,7 +1232,7 @@ const closeUserDetail = () => {
               <label>
                 <span>Harga Beli</span>
                 <input
-                  v-model="investmentForm.hargaBeli"
+                  :value="investmentForm.hargaBeli"
                   type="text"
                   inputmode="numeric"
                   placeholder="Contoh: 6.000.000"
@@ -1243,7 +1243,7 @@ const closeUserDetail = () => {
               <label>
                 <span>Harga Sekarang</span>
                 <input
-                  v-model="investmentForm.hargaSekarang"
+                  :value="investmentForm.hargaSekarang"
                   type="text"
                   inputmode="numeric"
                   placeholder="Contoh: 9.000.000"
@@ -1434,7 +1434,7 @@ const closeUserDetail = () => {
               <label>
                 <span>Jumlah Tabungan</span>
                 <input
-                  v-model="savingForm.totalTabungan"
+                  :value="savingForm.totalTabungan"
                   type="text"
                   inputmode="numeric"
                   placeholder="Contoh: 6.000.000"
