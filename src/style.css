@@ -104,6 +104,29 @@ input[type='number']::-webkit-outer-spin-button {
   gap: 12px;
 }
 
+.theme-toggle {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 50%;
+  background: rgba(8, 17, 27, 0.82);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 1.15rem;
+  line-height: 1;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+  transform: translateY(-1px);
+  border-color: var(--primary);
+  outline: none;
+}
+
 .profile-menu-wrap {
   position: relative;
 }
@@ -1402,6 +1425,136 @@ tbody td {
 .cancel-btn:hover,
 .danger-btn:hover {
   transform: translateY(-1px);
+}
+
+html[data-theme='light'] body {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(96, 165, 250, 0.14), transparent 18%),
+    radial-gradient(circle at 80% 10%, rgba(45, 212, 191, 0.12), transparent 22%),
+    linear-gradient(135deg, #eef6fb 0%, #f8fbfd 48%, #e8f2f7 100%);
+  color: #183047;
+}
+
+html[data-theme='light'] body::before {
+  background-image:
+    linear-gradient(rgba(71, 105, 132, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(71, 105, 132, 0.06) 1px, transparent 1px);
+}
+
+.light-mode {
+  color: #183047;
+}
+
+.light-mode .theme-toggle,
+.light-mode .profile-trigger {
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(71, 105, 132, 0.2);
+  color: #183047;
+}
+
+.light-mode .profile-menu {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(71, 105, 132, 0.18);
+  box-shadow: 0 18px 36px rgba(71, 105, 132, 0.16);
+}
+
+.light-mode .profile-menu-item {
+  color: #183047;
+}
+
+.light-mode .summary-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(232, 242, 247, 0.94));
+  border-color: rgba(71, 105, 132, 0.16);
+  box-shadow: 0 18px 50px rgba(71, 105, 132, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.light-mode .summary-card.primary {
+  background: linear-gradient(135deg, rgba(219, 238, 255, 0.96), rgba(255, 255, 255, 0.96));
+}
+
+.light-mode .summary-card.success {
+  background: linear-gradient(135deg, rgba(220, 250, 239, 0.96), rgba(255, 255, 255, 0.96));
+}
+
+.light-mode .summary-card.neutral {
+  background: linear-gradient(135deg, rgba(235, 241, 245, 0.96), rgba(255, 255, 255, 0.96));
+}
+
+.light-mode .summary-card.risk-card.conservative,
+.light-mode .summary-card.risk-card.moderate,
+.light-mode .summary-card.risk-card.aggressive {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(235, 243, 247, 0.96));
+}
+
+.light-mode .panel {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(241, 247, 250, 0.94));
+  border-color: rgba(71, 105, 132, 0.16);
+  box-shadow: 0 18px 50px rgba(71, 105, 132, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.light-mode .entry-form {
+  background: rgba(242, 248, 251, 0.9);
+  border-color: rgba(96, 165, 250, 0.24);
+  box-shadow: inset 0 0 18px rgba(96, 165, 250, 0.05);
+}
+
+.light-mode .entry-form input,
+.light-mode .entry-form select,
+.light-mode .entry-form option {
+  background: rgba(255, 255, 255, 0.94);
+  border-color: rgba(71, 105, 132, 0.2);
+  color: #183047;
+}
+
+.light-mode .table-wrap {
+  background: rgba(255, 255, 255, 0.58);
+  border-color: rgba(71, 105, 132, 0.14);
+}
+
+.light-mode th {
+  background: rgba(71, 105, 132, 0.06);
+}
+
+.light-mode th,
+.light-mode td {
+  border-color: rgba(71, 105, 132, 0.14);
+}
+
+.light-mode tbody tr:hover,
+.light-mode .total-row {
+  background: rgba(71, 105, 132, 0.05);
+}
+
+.light-mode tbody td {
+  color: #28445b;
+}
+
+.light-mode .secondary-btn,
+.light-mode .cancel-btn {
+  background: rgba(71, 105, 132, 0.07);
+  border-color: rgba(71, 105, 132, 0.16);
+  color: #183047;
+}
+
+.light-mode .risk-info-btn {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(71, 105, 132, 0.24);
+  color: #183047;
+}
+
+.light-mode .risk-info-tooltip,
+.light-mode .detail-dialog {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(239, 247, 250, 0.98));
+  border-color: rgba(71, 105, 132, 0.18);
+  box-shadow: 0 18px 36px rgba(71, 105, 132, 0.18);
+}
+
+.light-mode .tiny-btn.edit {
+  color: #087f70;
+}
+
+.light-mode .tiny-btn.delete {
+  color: #b4232f;
 }
 
 @media (max-width: 980px) {

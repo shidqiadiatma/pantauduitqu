@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://pantauduitqu-finance-portfolio-racker.onrender.com/api'
 const USER_STORAGE_KEY = 'portfolio-saving-tracker.currentUser'
+const THEME_STORAGE_KEY = 'portfolio-saving-tracker.theme'
 const API_TIMEOUT_MS = 10000
 
 const fetchWithTimeout = async (url, options = {}, timeoutMs = API_TIMEOUT_MS) => {
@@ -26,6 +27,15 @@ const loadStoredUser = () => {
   }
 }
 
+const loadStoredTheme = () => {
+  try {
+    return localStorage.getItem(THEME_STORAGE_KEY) || 'night'
+  } catch (error) {
+    console.error('Failed to load stored theme:', error)
+    return 'night'
+  }
+}
+
 const defaultInvestmentData = []
 const defaultSavingData = []
 
@@ -37,6 +47,8 @@ const otpMessage = ref('')
 const authError = ref('')
 const authSuccess = ref('')
 const currentUser = ref(loadStoredUser())
+const theme = ref(loadStoredTheme())
+document.documentElement.dataset.theme = theme.value
 const adminUsers = ref([])
 const selectedUserDetail = ref(null)
 const detailLoading = ref(false)
@@ -50,6 +62,12 @@ const passwordDialog = ref({ open: false, newPassword: '', confirmPassword: '' }
 
 const investmentData = ref([...defaultInvestmentData])
 const savingData = ref([...defaultSavingData])
+
+const toggleTheme = () => {
+  theme.value = theme.value === 'night' ? 'light' : 'night'
+  localStorage.setItem(THEME_STORAGE_KEY, theme.value)
+  document.documentElement.dataset.theme = theme.value
+}
 
 const fetchInvestmentData = async () => {
   try {
@@ -1119,7 +1137,7 @@ const closeUserDetail = () => {
     </main>
   </div>
 
-  <div v-else class="app-shell">
+  <div v-else class="app-shell" :class="{ 'light-mode': theme === 'light' }">
     <header class="topbar">
       <div class="brand-row">
         <img class="brand-icon" src="/pantauduitqu-logo.svg" alt="PantauDuitQu logo" />
@@ -1129,6 +1147,15 @@ const closeUserDetail = () => {
         </div>
       </div>
       <div class="topbar-actions">
+        <button
+          type="button"
+          class="theme-toggle"
+          :aria-label="theme === 'night' ? 'Aktifkan light mode' : 'Aktifkan night mode'"
+          :title="theme === 'night' ? 'Light mode' : 'Night mode'"
+          @click="toggleTheme"
+        >
+          <span aria-hidden="true">{{ theme === 'night' ? '☀' : '☾' }}</span>
+        </button>
         <div class="profile-menu-wrap">
           <button type="button" class="profile-trigger" @click="toggleProfileMenu">
             <span class="profile-avatar">{{ currentUser?.name?.charAt(0)?.toUpperCase() || 'U' }}</span>
