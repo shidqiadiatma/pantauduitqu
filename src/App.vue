@@ -670,6 +670,13 @@ const formatCurrency = (value) =>
     maximumFractionDigits: 0,
   }).format(value)
 
+const formatAmountInput = (value) => {
+  const digits = String(value ?? '').replace(/\D/g, '')
+  return digits ? Number(digits).toLocaleString('id-ID') : ''
+}
+
+const parseAmountInput = (value) => Number(String(value ?? '').replace(/\./g, ''))
+
 const formatPercent = (value) => `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`
 
 const resetInvestmentForm = () => {
@@ -692,6 +699,10 @@ const resetSavingForm = () => {
   }
 }
 
+const updateAmountInput = (form, field, event) => {
+  form.value[field] = formatAmountInput(event.target.value)
+}
+
 const addOrUpdateInvestment = async () => {
   if (!currentUser.value) return
 
@@ -700,8 +711,8 @@ const addOrUpdateInvestment = async () => {
     jenisAset: investmentForm.value.jenisAset.trim(),
     aplikasi: investmentForm.value.aplikasi.trim(),
     jumlah: Number(investmentForm.value.jumlah),
-    hargaBeli: Number(investmentForm.value.hargaBeli),
-    hargaSekarang: Number(investmentForm.value.hargaSekarang),
+    hargaBeli: parseAmountInput(investmentForm.value.hargaBeli),
+    hargaSekarang: parseAmountInput(investmentForm.value.hargaSekarang),
   }
 
   if (!payload.namaAset || !payload.jenisAset || !payload.aplikasi || payload.jumlah <= 0 || payload.hargaBeli <= 0 || payload.hargaSekarang <= 0) {
@@ -736,7 +747,7 @@ const addOrUpdateSaving = async () => {
 
   const payload = {
     namaAplikasi: savingForm.value.namaAplikasi.trim(),
-    totalTabungan: Number(savingForm.value.totalTabungan),
+    totalTabungan: parseAmountInput(savingForm.value.totalTabungan),
   }
 
   if (!payload.namaAplikasi || payload.totalTabungan <= 0) {
@@ -767,7 +778,11 @@ const addOrUpdateSaving = async () => {
 }
 
 const editInvestment = (item) => {
-  investmentForm.value = { ...item }
+  investmentForm.value = {
+    ...item,
+    hargaBeli: formatAmountInput(item.hargaBeli),
+    hargaSekarang: formatAmountInput(item.hargaSekarang),
+  }
 }
 
 const confirmDelete = (type, id, label) => {
@@ -822,7 +837,10 @@ const closeConfirmModal = () => {
 }
 
 const editSaving = (item) => {
-  savingForm.value = { ...item }
+  savingForm.value = {
+    ...item,
+    totalTabungan: formatAmountInput(item.totalTabungan),
+  }
 }
 
 const deleteSaving = (id) => {
@@ -1213,11 +1231,25 @@ const closeUserDetail = () => {
               </label>
               <label>
                 <span>Harga Beli</span>
-                <input v-model="investmentForm.hargaBeli" type="number" min="0" step="any" inputmode="numeric" required />
+                <input
+                  v-model="investmentForm.hargaBeli"
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="Contoh: 6.000.000"
+                  required
+                  @input="updateAmountInput(investmentForm, 'hargaBeli', $event)"
+                />
               </label>
               <label>
                 <span>Harga Sekarang</span>
-                <input v-model="investmentForm.hargaSekarang" type="number" min="0" step="any" inputmode="numeric" required />
+                <input
+                  v-model="investmentForm.hargaSekarang"
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="Contoh: 9.000.000"
+                  required
+                  @input="updateAmountInput(investmentForm, 'hargaSekarang', $event)"
+                />
               </label>
             </div>
             <div class="form-actions">
@@ -1401,7 +1433,14 @@ const closeUserDetail = () => {
               </label>
               <label>
                 <span>Jumlah Tabungan</span>
-                <input v-model="savingForm.totalTabungan" type="number" min="0" step="any" inputmode="numeric" required />
+                <input
+                  v-model="savingForm.totalTabungan"
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="Contoh: 6.000.000"
+                  required
+                  @input="updateAmountInput(savingForm, 'totalTabungan', $event)"
+                />
               </label>
             </div>
             <div class="form-actions">
