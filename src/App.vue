@@ -2,6 +2,29 @@
 import { computed, onMounted, ref } from 'vue'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://pantauduitqu-finance-portfolio-racker.onrender.com/api'
+const USER_STORAGE_KEY = 'portfolio-saving-tracker.currentUser'
+const API_TIMEOUT_MS = 10000
+
+const fetchWithTimeout = async (url, options = {}, timeoutMs = API_TIMEOUT_MS) => {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+
+  try {
+    return await fetch(url, { ...options, signal: controller.signal })
+  } finally {
+    clearTimeout(timeoutId)
+  }
+}
+
+const loadStoredUser = () => {
+  try {
+    const storedUser = localStorage.getItem(USER_STORAGE_KEY)
+    return storedUser ? JSON.parse(storedUser) : null
+  } catch (error) {
+    console.error('Failed to load stored user:', error)
+    return null
+  }
+}
 
 const defaultInvestmentData = []
 const defaultSavingData = []
@@ -13,7 +36,7 @@ const otpState = ref('idle')
 const otpMessage = ref('')
 const authError = ref('')
 const authSuccess = ref('')
-const currentUser = ref(null)
+const currentUser = ref(loadStoredUser())
 const adminUsers = ref([])
 const selectedUserDetail = ref(null)
 const detailLoading = ref(false)
@@ -30,27 +53,25 @@ const savingData = ref([...defaultSavingData])
 
 const fetchInvestmentData = async () => {
   try {
-    const response = await fetch(`${API_BASE}/investment`)
+    const response = await fetchWithTimeout(`${API_BASE}/investment`)
     if (!response.ok) throw new Error('Failed to load investment data')
 
     const investment = await response.json()
     investmentData.value = Array.isArray(investment) ? investment : []
   } catch (error) {
     console.error('Failed to fetch investment data from backend:', error)
-    investmentData.value = []
   }
 }
 
 const fetchSavingData = async () => {
   try {
-    const response = await fetch(`${API_BASE}/saving`)
+    const response = await fetchWithTimeout(`${API_BASE}/saving`)
     if (!response.ok) throw new Error('Failed to load saving data')
 
     const saving = await response.json()
     savingData.value = Array.isArray(saving) ? saving : []
   } catch (error) {
     console.error('Failed to fetch saving data from backend:', error)
-    savingData.value = []
   }
 }
 
@@ -58,7 +79,7 @@ const fetchUserPortfolio = async () => {
   if (!currentUser.value) return
 
   try {
-    const response = await fetch(`${API_BASE}/portfolio/${currentUser.value.id}`)
+    const response = await fetchWithTimeout(`${API_BASE}/portfolio/${currentUser.value.id}`)
     if (!response.ok) throw new Error('Failed to load user portfolio')
 
     const portfolio = await response.json()
@@ -66,8 +87,6 @@ const fetchUserPortfolio = async () => {
     savingData.value = Array.isArray(portfolio?.saving) ? portfolio.saving : []
   } catch (error) {
     console.error('Failed to fetch user portfolio:', error)
-    investmentData.value = []
-    savingData.value = []
   }
 }
 
@@ -75,7 +94,7 @@ const fetchAdminData = async () => {
   if (!currentUser.value || currentUser.value.role !== 'superadmin') return
 
   try {
-    const response = await fetch(`${API_BASE}/users`)
+    const response = await fetchWithTimeout(`${API_BASE}/users`)
     if (!response.ok) throw new Error('Failed to load admin users')
 
     adminUsers.value = await response.json()
@@ -106,7 +125,7 @@ const requestOtp = async () => {
   }
 
   try {
-    const response = await fetch(`${API_BASE}/request-otp`, {
+    const response = await fetchWithTimeout(`${API_BASE}/request-otp`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),
@@ -155,7 +174,7 @@ const handleAuthSubmit = async () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE}/register`, {
+      const response = await fetchWithTimeout(`${API_BASE}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -191,7 +210,7 @@ const handleAuthSubmit = async () => {
     const email = authForm.value.email.trim().toLowerCase()
     const payload = { email, password: authForm.value.password }
 
-    const response = await fetch(`${API_BASE}/login`, {
+    const response = await fetchWithTimeout(`${API_BASE}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -204,6 +223,7 @@ const handleAuthSubmit = async () => {
     }
 
     currentUser.value = data
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(data))
     authForm.value = { name: '', email: '', password: '' }
     otpCode.value = ''
     otpState.value = 'idle'
@@ -256,7 +276,7 @@ const updateProfile = async () => {
   }
 
   try {
-    const response = await fetch(`${API_BASE}/profile/${currentUser.value.id}`, {
+    const response = await fetchWithTimeout(`${API_BASE}/profile/${currentUser.value.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: trimmedName }),
@@ -269,6 +289,7 @@ const updateProfile = async () => {
     }
 
     currentUser.value = { ...currentUser.value, name: data.name }
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(currentUser.value))
     profileForm.value.name = data.name
     profileMessage.value = 'Nama lengkap berhasil diperbarui.'
     profileError.value = ''
@@ -312,7 +333,7 @@ const updatePassword = async () => {
   }
 
   try {
-    const response = await fetch(`${API_BASE}/profile/${currentUser.value.id}/password`, {
+    const response = await fetchWithTimeout(`${API_BASE}/profile/${currentUser.value.id}/password`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password: newPassword }),
@@ -336,6 +357,7 @@ const logout = () => {
   profileMenuOpen.value = false
   profileView.value = false
   currentUser.value = null
+  localStorage.removeItem(USER_STORAGE_KEY)
   authMode.value = 'login'
   authError.value = ''
   profileError.value = ''
@@ -694,7 +716,7 @@ const addOrUpdateInvestment = async () => {
 
     const method = id ? 'PUT' : 'POST'
 
-    const response = await fetch(url, {
+    const response = await fetchWithTimeout(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...payload, id: id ?? Date.now() }),
@@ -729,7 +751,7 @@ const addOrUpdateSaving = async () => {
 
     const method = id ? 'PUT' : 'POST'
 
-    const response = await fetch(url, {
+    const response = await fetchWithTimeout(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...payload, id: id ?? Date.now() }),
@@ -768,14 +790,14 @@ const proceedDelete = async () => {
 
   try {
     if (confirmModal.value.type === 'investment') {
-      const response = await fetch(`${API_BASE}/portfolio/${currentUser.value.id}/investment/${confirmModal.value.targetId}`, {
+      const response = await fetchWithTimeout(`${API_BASE}/portfolio/${currentUser.value.id}/investment/${confirmModal.value.targetId}`, {
         method: 'DELETE',
       })
 
       if (!response.ok) throw new Error('Delete investment failed')
       await fetchUserPortfolio()
     } else {
-      const response = await fetch(`${API_BASE}/portfolio/${currentUser.value.id}/saving/${confirmModal.value.targetId}`, {
+      const response = await fetchWithTimeout(`${API_BASE}/portfolio/${currentUser.value.id}/saving/${confirmModal.value.targetId}`, {
         method: 'DELETE',
       })
 
@@ -813,7 +835,7 @@ const openUserDetail = async (user) => {
   detailError.value = ''
 
   try {
-    const response = await fetch(`${API_BASE}/portfolio/${user.id}`)
+    const response = await fetchWithTimeout(`${API_BASE}/portfolio/${user.id}`)
     if (!response.ok) throw new Error('Gagal mengambil detail portfolio user')
 
     const portfolio = await response.json()

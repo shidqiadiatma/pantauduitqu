@@ -19,6 +19,8 @@ const DB_CONFIG = {
   database: process.env.MYSQL_DATABASE || 'pantauduitqu',
   waitForConnections: true,
   connectionLimit: 10,
+  connectTimeout: 5000,
+  acquireTimeout: 5000,
   multipleStatements: false,
 }
 
@@ -48,9 +50,9 @@ const createSmtpTransporter = () => {
     host: smtpConfig.host,
     port: smtpConfig.port,
     secure: smtpConfig.secure,
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
+    connectionTimeout: 5000,
+    greetingTimeout: 5000,
+    socketTimeout: 8000,
     auth: {
       user: smtpConfig.user,
       pass: smtpConfig.pass,
@@ -151,11 +153,6 @@ const initializeDatabase = async () => {
         CONSTRAINT fk_saving_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     `)
-
-    await connection.execute('DELETE FROM investment_items')
-    await connection.execute('DELETE FROM saving_items')
-    await connection.execute('ALTER TABLE investment_items AUTO_INCREMENT = 1')
-    await connection.execute('ALTER TABLE saving_items AUTO_INCREMENT = 1')
 
     const [existingAdmin] = await connection.execute('SELECT id FROM users WHERE email = ? LIMIT 1', ['admin@tracker.com'])
     if (!existingAdmin.length) {

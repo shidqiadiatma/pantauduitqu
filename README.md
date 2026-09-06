@@ -98,6 +98,8 @@ SMTP_SECURE=false
 2. Buat database `pantauduitqu` jika belum ada.
 3. Backend akan otomatis membuat table yang dibutuhkan saat pertama kali berjalan.
 
+Data investasi dan tabungan disimpan permanen di MySQL berdasarkan user yang sedang login. Menjalankan atau me-deploy ulang backend tidak menghapus data yang sudah tersimpan.
+
 Contoh SQL:
 
 ```sql
